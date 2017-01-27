@@ -1,0 +1,26 @@
+On the Teensy (I am using a Teensy 3.1)
+
+This is a sample reworked for the Teensyduino HID RAW example for the Teensy 3.1.
+The sample implements a HID RAW USB device on the Teensy 3.1 that sends a RAW 64 byte
+packet every two minutes.  This packet contains in the fist byte 0xAB and in the 
+second 0xCD; the next 24 bytes are analog mesurments from the Teensy, the rest of the 
+bytes up to the last two bytes are zero.  The last two bytes are the number of packets 
+sent.
+ 
+The Teensy can also receive a 64 byte packet as well, in this example the first byte 
+will set the outputs on pins 0 - 7.
+
+
+The linux user code to interact with the Teensy.
+
+The original code used libusb but for some reason only seven packets would be sent 
+then it would fail.  This code is from Linus Torvalds' repository, using the hidraw 
+device driver.  I modified the code to receive the packets from the Teensy and display
+them to the console.  I have not yet added the send packet that was in to original client
+example. I will eventually add this code as well.
+
+
+No udev rules as yet so you must run as root.
+
+
+ 
