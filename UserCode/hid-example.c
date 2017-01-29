@@ -107,6 +107,7 @@ int main(int argc, char **argv)
 	int fd;
 	int i, res, desc_size = 0;
 	unsigned char buf[256];
+	unsigned char inc = 0;
 	struct hidraw_report_descriptor rpt_desc;
 	struct hidraw_devinfo info;
 	char *device = "/dev/hidraw0";
@@ -201,26 +202,39 @@ int main(int argc, char **argv)
 // The bits of the first byte sent are used to set ouputs (0-7) on the Teensy.
 
 	/* Send a Report to the Device */
-//	buf[0] = 0x1; /* Report Number */
-//	buf[1] = 0x77;
-//	res = write(fd, buf, 2);
-//	if (res < 0) {
-//		printf("Error: %d\n", errno);
-//		perror("write");
-//	} else {
-//		printf("write() wrote %d bytes\n", res);
-//	}
+	buf[0] = inc++; /* Report Number */
+	buf[1] = 0x77;
+	res = write(fd, buf, 64);
+	if (res < 0) {
+		printf("Error: %d\n", errno);
+		perror("write");
+	} else {
+		printf("write() wrote %d bytes\n", res);
+	}
 
-	/* Teensy sends a report every two seconds.  Get a report from the device */
+	
 	for(;;)
 	{
+		// The Teensy code expects a 64 byte packet, no report number!
+		// The bits of the first byte sent are used to set ouputs (0-7) on the Teensy.
+
+		/* Send a Report to the Device */
+		buf[0] = inc++; /* Report Number */
+		buf[1] = 0x77;
+		res = write(fd, buf, 64);
+		if (res < 0) {
+			printf("Error: %d\n", errno);
+			perror("write");
+		} else {
+			printf("write() wrote %d bytes\n", res);
+		}
+
+		/* Teensy sends a report every two seconds.  Get a report from the device */
 		res = read(fd, buf, 64);
 		if (res < 0) {
 			perror("read");
 		} else {
 			printf("read() read %d bytes:\n", res);
-//			for (i = 0; i < res; i++)
-//				printf("%hhx ", buf[i]);
 			dump_data(buf, res);
 			puts("\n");
 		}
