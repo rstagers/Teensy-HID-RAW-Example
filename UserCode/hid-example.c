@@ -202,15 +202,15 @@ int main(int argc, char **argv)
 // The bits of the first byte sent are used to set ouputs (0-7) on the Teensy.
 
 	/* Send a Report to the Device */
-	buf[0] = inc++; /* Report Number */
-	buf[1] = 0x77;
-	res = write(fd, buf, 64);
-	if (res < 0) {
-		printf("Error: %d\n", errno);
-		perror("write");
-	} else {
-		printf("write() wrote %d bytes\n", res);
-	}
+	//buf[0] = inc++; /* Report Number */
+	//buf[1] = 0x77;
+	//res = write(fd, buf, 64);
+	//if (res < 0) {
+	//	printf("Error: %d\n", errno);
+	//	perror("write");
+	//} else {
+	//	printf("write() wrote %d bytes\n", res);
+	//}
 
 	
 	for(;;)
@@ -219,8 +219,13 @@ int main(int argc, char **argv)
 		// The bits of the first byte sent are used to set ouputs (0-7) on the Teensy.
 
 		/* Send a Report to the Device */
-		buf[0] = inc++; /* Report Number */
-		buf[1] = 0x77;
+
+		buf[0] = inc;
+		inc++;
+		if(inc == 10)
+			inc = 0;
+
+ 		buf[1] = 0x00;
 		res = write(fd, buf, 64);
 		if (res < 0) {
 			printf("Error: %d\n", errno);
