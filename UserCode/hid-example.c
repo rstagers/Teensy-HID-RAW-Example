@@ -7,6 +7,9 @@
  * The code may be used by anyone for any purpose,
  * and can serve as a starting point for developing
  * applications using hidraw.
+
+  /dev/hidraw3 and /dev/hidraw4 must be chmod 666 to operate!
+
  */
 
 /* Linux */
@@ -105,12 +108,17 @@ void dump_data( unsigned char * buffer, unsigned int length)
 int main(int argc, char **argv)
 {
 	int fd;
-	int i, res, desc_size = 0;
+	int fd2;
+
+	int i, res, res2, desc_size = 0;
 	unsigned char buf[256];
+	unsigned char buf2[512];
+
 	unsigned char inc = 0;
 	struct hidraw_report_descriptor rpt_desc;
 	struct hidraw_devinfo info;
-	char *device = "/dev/hidraw0";
+	char *device = "/dev/hidraw3";
+	char *device2 = "/dev/hidraw4";
 
 	if (argc > 1)
 		device = argv[1];
@@ -118,9 +126,11 @@ int main(int argc, char **argv)
 	/* Open the Device with non-blocking reads. In real life,
 	   don't use a hard coded path; use libudev instead. */
 	fd = open(device, O_RDWR);
+	fd2 = open(device2, O_RDWR);
+
 //	fd = open(device, O_RDWR|O_NONBLOCK);
 
-	if (fd < 0) {
+	if (fd < 0 || fd2 < 0) {
 		perror("Unable to open device");
 		return 1;
 	}
@@ -222,8 +232,6 @@ int main(int argc, char **argv)
 
 		buf[0] = inc;
 		inc++;
-		if(inc == 10)
-			inc = 0;
 
  		buf[1] = 0x00;
 		res = write(fd, buf, 64);
@@ -236,6 +244,8 @@ int main(int argc, char **argv)
 
 		/* Teensy sends a report every two seconds.  Get a report from the device */
 		res = read(fd, buf, 64);
+		res2 = read(fd2, buf2, 32);
+
 		if (res < 0) {
 			perror("read");
 		} else {
@@ -280,6 +290,7 @@ int main(int argc, char **argv)
 		}
 	}
 	close(fd);
+	close(fd2);
 	return 0;
 }
 
